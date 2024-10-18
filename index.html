@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Clock</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div>
+            <div class="panel" id="clock-panel">
+                <span class="big" id="current-time">00:00:00</span>
+                <span class="small" id="current-date">01.01.1970</span>
+            </div>
+    
+            <div class="panel hidden" id="stopwatch-panel">
+                <span class="big" id="stopwatch-display">00:00:00.00</span>
+                <div class="button-panel">
+                    <button id="start-stop-stopwatch">Start</button>
+                    <button class="disabled" id="lap-stopwatch" disabled>Lap</button>
+                    <button id="reset-stopwatch">Reset</button>
+                </div>
+
+                <div id="lap-list" class="lap-list">
+                    <span>Laps will appear here</span>
+                </div>
+            </div>
+    
+            <div class="panel hidden" id="timer-panel">
+                <div class="sub-panel" id="timer-set-panel">
+                    <input type="text" value="00:01:30" placeholder="00:01:30" id="timer-set-input">
+                    <button id="start-timer">Start</button>
+                </div>
+
+                <div class="sub-panel hidden" id="timer-display-panel">
+                    <span class="big" id="timer-display">00:00:00</span>
+                    <div class="button-panel">
+                        <button id="start-stop-timer">Stop</button>
+                        <button id="reset-timer">Reset</button>
+                    </div>
+                </div>
+
+                <div class="sub-panel hidden" id="time-is-up-panel">
+                    <span class="big">Time`s up!</span>
+                    <div class="button-panel">
+                        <button id="close">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-switch">
+            <div class="switch-item selected" id="clock-switch">
+                <span id="clock-switch-span">Clock</span>
+            </div>
+
+            <div class="switch-item" id="stopwatch-switch">
+                <span id="stopwatch-switch-span">Stopwatch</span>
+            </div>
+
+            <div class="switch-item" id="timer-switch">
+                <span id="timer-switch-span">Timer</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/panel-switch.js"></script>
+    <script src="js/clock.js"></script>
+    <script src="js/stopwatch.js"></script>
+    <script src="js/timer.js"></script>
+</body>
+</html>
