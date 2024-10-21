@@ -1,23 +1,40 @@
 let isRunningTimer = false;
 let intervalTimer;
-const remainingTime = { hour: 0, minute: 0, second: 0, ms: 0 };
+let stopTime = 0;
+let remainTime = 0;
+
 const audio = new Audio("../sounds/timer-sound.ogg");
 
 document.getElementById("start-timer").addEventListener("click", function () {
-    const regex = /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/;
-    let timeInput = document.getElementById("timer-set-input");
+    const regex = /[0-9]{2}/; 
 
-    if(!regex.test(timeInput.value)){
-        timeInput.style.border = "1px solid red";
+    const secInput = document.getElementById("seconds-timer");
+    const minInput = document.getElementById("minutes-timer");
+    const hrsInput = document.getElementById("hours-timer");
+    
+    if (!regex.test(secInput.value) || parseInt(secInput.value) < 0 || parseInt(secInput.value) > 59) {
+        return;
+    }
+    
+    if (!regex.test(minInput.value) || parseInt(minInput.value) < 0 || parseInt(minInput.value) > 60) {
+        return;
+    }
+
+    if (!regex.test(hrsInput.value) || parseInt(hrsInput.value) < 0 || parseInt(hrsInput.value) > 99) {
+        return;
+    }
+
+    if(parseInt(secInput.value) == 0 && parseInt(minInput.value) == 0 && parseInt(hrsInput.value) == 0){
         return;
     }
 
     document.getElementById("timer-set-panel").classList.add("hidden");
     document.getElementById("timer-display-panel").classList.remove("hidden");
-    timeInput.style.border = "1px solid black";
 
     isRunningTimer = true;
-    startTimer();
+
+    document.getElementById("timer-display").innerHTML = `${hrsInput.value}:${minInput.value}:${secInput.value}`;
+    setTimeout(startTimer, 1000);
 });
 
 document.getElementById("reset-timer").addEventListener("click", function () {
@@ -27,12 +44,10 @@ document.getElementById("reset-timer").addEventListener("click", function () {
 document.getElementById("start-stop-timer").addEventListener("click", function (e) {
     if (isRunningTimer) {
         e.target.innerHTML = "Start";
-        isRunningTimer = false;
-        clearInterval(intervalTimer); 
+        stopTimer();
     } else {
         e.target.innerHTML = "Stop";
-        isRunningTimer = true;
-        startInterval(); 
+        continueTimer();
     }
 });
 
@@ -41,15 +56,30 @@ document.getElementById("close").addEventListener("click", function () {
 });
 
 function startTimer() {
-    let time = document.getElementById("timer-set-input").value.split(":");
-    remainingTime.hour = parseInt(time[0]);
-    remainingTime.minute = parseInt(time[1]);
-    remainingTime.second = parseInt(time[2]);
-    remainingTime.ms = 0;
+    const now = new Date();
+    const startTime = now.getTime();
 
-    updateTimerDisplay();
+    const secInput = document.getElementById("seconds-timer");
+    const minInput = document.getElementById("minutes-timer");
+    const hrsInput = document.getElementById("hours-timer");
+
+
+    stopTime = stopTime + startTime + (hrsInput.value * 3600000) + (minInput.value * 60000) + (secInput.value * 1000);
 
     startInterval();
+}
+
+function stopTimer(){
+    isRunningTimer = false;
+    clearInterval(intervalTimer); 
+}
+
+function continueTimer(){
+    const now = new Date().getTime();
+    stopTime = now + remainTime;
+
+    isRunningTimer = true;
+    startInterval(); 
 }
 
 function startInterval() {
@@ -60,31 +90,25 @@ function startInterval() {
 }
 
 function updateRemainingTime() {
-    remainingTime.ms -= 100; 
+    const currentTime = new Date().getTime();
+    remainTime = stopTime - currentTime;
 
-    if (remainingTime.ms < 0) {
-        remainingTime.second--;
-        remainingTime.ms = 900; 
-
-        if (remainingTime.second < 0) {
-            remainingTime.minute--;
-            remainingTime.second = 59;
-
-            if (remainingTime.minute < 0) {
-                remainingTime.hour--;
-                remainingTime.minute = 59;
-
-                if (remainingTime.hour < 0) {
-                    resetTimer();
-                    showTimeIsUpPanel();
-                }
-            }
-        }
+    if(remainTime <= 0){
+        resetTimer();
+        showTimeIsUpPanel();
+    }else{
+        updateTimerDisplay(); 
     }
 }
 
+
 function updateTimerDisplay() {
-    document.getElementById("timer-display").innerHTML = `${remainingTime.hour.toString().padStart(2, '0')}:${remainingTime.minute.toString().padStart(2, '0')}:${remainingTime.second.toString().padStart(2, '0')}`;
+
+    const hours = String(Math.floor(remainTime / 3600000)).padStart(2, '0');
+    const mins = String(Math.floor((remainTime % 3600000) / 60000)).padStart(2, '0');
+    const secs = String(Math.floor((remainTime % 60000) / 1000)).padStart(2, '0');
+
+    document.getElementById("timer-display").innerHTML = `${hours}:${mins}:${secs}`;
 }
 
 function resetTimer() {
@@ -93,10 +117,8 @@ function resetTimer() {
     document.getElementById("time-is-up-panel").classList.add("hidden");
     document.getElementById("start-stop-timer").innerHTML = "Stop";
 
-    remainingTime.hour = 0;
-    remainingTime.minute = 0;
-    remainingTime.second = 0;
-    remainingTime.ms = 0;
+    remainTime = 0;
+    stopTime = 0;
     isRunningTimer = false;
 
     clearInterval(intervalTimer);

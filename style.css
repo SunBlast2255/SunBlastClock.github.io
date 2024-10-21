@@ -55,13 +55,14 @@
     box-shadow: 0px 0px 20px 0px rgba(173,173,173,1);
 }
 
-.button-panel{
+.control-panel{
     width: 100%;
     height: fit-content;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+    font-weight: bold;
 }
 
 .lap-list{
@@ -128,7 +129,7 @@ button:active {
 }
 
 input[type="text"]{
-    width: 215px;
+    width: 75px;
     height: 35px;
     text-align: center;
     font-size: 32px;
@@ -160,7 +161,7 @@ input[type="text"]:focus{
         width: 95vw;
     }
 
-    #stopwatch-panel .button-panel{
+    #stopwatch-panel .control-panel{
         flex-direction: column;
     }
 

@@ -1,89 +1,42 @@
 let isRunningStopwatch = false;
 let intervalStopwatch;
+let startTime, elapsedTime = 0;
 
-let currentTime = {
-    ms: 0,
-    sec: 0,
-    min: 0,
-    hour: 0
-};
-
-let lastLapTime = {
-    ms: 0,
-    sec: 0,
-    min: 0,
-    hour: 0
-};
-
+let lastLapTime = 0;
 let lapCount = 0;
 
 function updateStopwatch() {
-    currentTime.ms += 1;
+    const now = new Date().getTime();
+    elapsedTime = now - startTime;
 
-    if (currentTime.ms > 99) {
-        currentTime.ms = 0;
-        currentTime.sec += 1;
+    const ms = Math.floor((elapsedTime % 1000) / 10); 
+    const sec = Math.floor((elapsedTime / 1000) % 60);
+    const min = Math.floor((elapsedTime / (1000 * 60)) % 60);
+    const hour = Math.floor((elapsedTime / (1000 * 60 * 60)) % 24);
 
-        if (currentTime.sec > 59) {
-            currentTime.sec = 0;
-            currentTime.min += 1;
-
-            if (currentTime.min > 59) {
-                currentTime.min = 0;
-                currentTime.hour += 1;
-            }
-        }
-    }
-
-    document.getElementById("stopwatch-display").innerHTML = `${currentTime.hour.toString().padStart(2, '0')}:${currentTime.min.toString().padStart(2, '0')}:${currentTime.sec.toString().padStart(2, '0')}.${currentTime.ms.toString().padStart(2, '0')}`;
+    document.getElementById("stopwatch-display").innerHTML = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
 }
 
-function resetStopwatch(){
-    currentTime = {
-        ms: 0,
-        sec: 0,
-        min: 0,
-        hour: 0
-    };
-
-    lastLapTime = {
-        ms: 0,
-        sec: 0,
-        min: 0,
-        hour: 0
-    };
-
+function resetStopwatch() {
+    elapsedTime = 0;
+    lastLapTime = 0;
     lapCount = 0;
     isRunningStopwatch = false;
 }
 
 function addLap() {
-    let lapTime = {
-        hour: currentTime.hour - lastLapTime.hour,
-        min: currentTime.min - lastLapTime.min,
-        sec: currentTime.sec - lastLapTime.sec,
-        ms: currentTime.ms - lastLapTime.ms
-    };
+    const now = new Date().getTime();
+    const lapTime = now - startTime - lastLapTime;
 
-    if (lapTime.ms < 0) {
-        lapTime.ms += 100;
-        lapTime.sec--;
-    }
+    const ms = Math.floor((lapTime % 1000) / 10);
+    const sec = Math.floor((lapTime / 1000) % 60);
+    const min = Math.floor((lapTime / (1000 * 60)) % 60);
+    const hour = Math.floor((lapTime / (1000 * 60 * 60)) % 24);
 
-    if (lapTime.sec < 0) {
-        lapTime.sec += 60;
-        lapTime.min--;
-    }
+    lastLapTime += lapTime;
 
-    if (lapTime.min < 0) {
-        lapTime.min += 60;
-        lapTime.hour--;
-    }
-
-    lastLapTime = { ...currentTime };
-
-    const formattedLapTime = `${lapTime.hour.toString().padStart(2, '0')}:${lapTime.min.toString().padStart(2, '0')}:${lapTime.sec.toString().padStart(2, '0')}.${lapTime.ms.toString().padStart(2, '0')}`;
-    const overallTime = `${currentTime.hour.toString().padStart(2, '0')}:${currentTime.min.toString().padStart(2, '0')}:${currentTime.sec.toString().padStart(2, '0')}.${currentTime.ms.toString().padStart(2, '0')}`;
+    const formattedLapTime = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+    const overallTime = `${Math.floor((elapsedTime / (1000 * 60 * 60)) % 24).toString().padStart(2, '0')}:${Math.floor((elapsedTime / (1000 * 60)) % 60).toString().padStart(2, '0')}:${Math.floor((elapsedTime / 1000) % 60).toString().padStart(2, '0')}.${Math.floor((elapsedTime % 1000) / 10).toString().padStart(2, '0')}`;
 
     updateLapList(formattedLapTime, overallTime);
 }
@@ -131,6 +84,7 @@ document.getElementById("start-stop-stopwatch").addEventListener("click", functi
     if (!isRunningStopwatch) {
         e.target.innerHTML = "Stop";
         isRunningStopwatch = true;
+        startTime = new Date().getTime() - elapsedTime;
 
         lapBtn.classList.remove("disabled");
         lapBtn.disabled = false;
